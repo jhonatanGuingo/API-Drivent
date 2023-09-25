@@ -1,3 +1,6 @@
+import { type } from 'os';
+import { Ticket, TicketType } from '@prisma/client';
+
 export type ApplicationError = {
   name: string;
   message: string;
@@ -25,4 +28,14 @@ export type AddressEnrollment = {
 
 export type CEP = {
   cep: string;
+};
+
+export type TicketTypeId = {
+  ticketTypeId: number;
+};
+
+export type NewTicket = Omit<Ticket, 'id' | 'createdAt' | 'updatedAt'>;
+
+export type TicketResponse = Ticket & {
+  TicketType: TicketType;
 };
