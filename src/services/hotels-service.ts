@@ -3,20 +3,21 @@ import { enrollmentRepository, ticketsRepository } from '@/repositories';
 import { hotelsRepository } from '@/repositories/hotels-repository';
 
 async function getHotels(userId: number) {
-  const enrollment = await enrollmentRepository.getByUserId(userId);
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
 
   if (!enrollment) throw notFoundError();
 
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
   const hotels = await hotelsRepository.getHotels();
-
-  if (!ticket || hotels.count === 0) throw notFoundError();
-
   if (ticket.status === 'RESERVED' || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) {
     throw paymentError();
   }
 
-  return hotels.hotels;
+  if (!ticket) throw notFoundError();
+
+  if (hotels.length === 0) throw notFoundError();
+
+  return hotels;
 }
 
 async function getHotelById(hotelId: string, userId: number) {
@@ -26,11 +27,11 @@ async function getHotelById(hotelId: string, userId: number) {
   const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
   const hotel = await hotelsRepository.getHotelById(Number(hotelId));
 
-  if (!ticket || !hotel) throw notFoundError();
-
   if (ticket.status === 'RESERVED' || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) {
     throw paymentError();
   }
+
+  if (!ticket || !hotel) throw notFoundError();
 
   return hotel;
 }

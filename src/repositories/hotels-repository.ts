@@ -1,11 +1,10 @@
 import { Hotel } from '@prisma/client';
 import { prisma } from '@/config';
 
-async function getHotels(): Promise<{ hotels: Hotel[]; count: number }> {
+async function getHotels(): Promise<Hotel[]> {
   const hotels = await prisma.hotel.findMany();
-  const count = await prisma.hotel.count();
 
-  return { hotels: hotels, count };
+  return hotels;
 }
 
 async function getHotelById(hotelId: number) {
