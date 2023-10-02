@@ -55,6 +55,7 @@ describe('GET /hotels', () => {
       const user = await createUser();
 
       const token = await generateValidToken(user);
+
       await createEnrollmentWithAddress(user);
 
       const response = await server.get('/hotels').set('Authorization', `Bearer ${token}`);
