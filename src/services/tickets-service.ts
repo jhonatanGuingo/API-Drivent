@@ -1,40 +1,41 @@
-import { Enrollment, TicketStatus } from '@prisma/client';
-import { notFoundError } from '@/errors';
-import { ticketsRepository } from '@/repositories/tickets-repository';
+import { TicketStatus } from '@prisma/client';
+import { invalidDataError, notFoundError } from '@/errors';
+import { CreateTicketParams } from '@/protocols';
+import { enrollmentRepository, ticketsRepository } from '@/repositories';
 
-export async function getTickets(id: number) {
-  const ticket = await ticketsRepository.getTicketsbyUser(id);
-
-  if (!ticket) throw notFoundError();
-
-  return ticket;
+async function findTicketTypes() {
+  const ticketTypes = await ticketsRepository.findTicketTypes();
+  return ticketTypes;
 }
 
-export async function newTicket(userId: number, ticketTypeId: number) {
-  const enrollment: Enrollment = await ticketsRepository.searchEnrollment(userId);
-
+async function getTicketByUserId(userId: number) {
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw notFoundError();
 
-  const data = {
-    status: TicketStatus.RESERVED,
-    ticketTypeId,
-    enrollmentId: enrollment.id,
-  };
-
-  const ticket = await ticketsRepository.newTicket(data);
-
+  const ticket = await ticketsRepository.findTicketByEnrollmentId(enrollment.id);
   if (!ticket) throw notFoundError();
 
   return ticket;
 }
 
-export async function getTicketsTypes() {
-  const tickets = await ticketsRepository.getTicketsTypes();
-  return tickets;
+async function createTicket(userId: number, ticketTypeId: number) {
+  if (!ticketTypeId) throw invalidDataError('ticketTypeId');
+
+  const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!enrollment) throw notFoundError();
+
+  const ticketData: CreateTicketParams = {
+    enrollmentId: enrollment.id,
+    ticketTypeId,
+    status: TicketStatus.RESERVED,
+  };
+
+  const ticket = await ticketsRepository.createTicket(ticketData);
+  return ticket;
 }
 
 export const ticketsService = {
-  getTickets,
-  newTicket,
-  getTicketsTypes,
+  findTicketTypes,
+  getTicketByUserId,
+  createTicket,
 };
