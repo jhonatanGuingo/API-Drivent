@@ -15,7 +15,7 @@ async function findBookingbyUser(userId: number) {
 }
 
 async function findRoom(roomId: number) {
-  const room = await prisma.room.findUnique({
+  const room = await prisma.room.findFirst({
     where: {
       id: roomId,
     },
