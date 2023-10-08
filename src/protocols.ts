@@ -55,5 +55,5 @@ export type RoomId = {
 };
 
 export type BookingId = {
-  bookingId: string | number;
+  bookingId: number;
 };
