@@ -4,16 +4,19 @@ import { bookingRepository } from '@/repositories/booking-repository';
 
 export async function getBooking(userId: number) {
   const booking = await bookingRepository.findBookingbyUser(userId);
-  console.log('cheguei');
-  if (!booking) return notFoundError();
+  if (!booking) throw notFoundError();
   const body = {
-    bookingId: booking.id,
+    id: booking.id,
     Room: booking.Room,
   };
   return body;
 }
 
 export async function postBooking(userId: number, roomId: number) {
+  const room = await bookingRepository.findRoom(roomId);
+  if (!room) throw notFoundError();
+  if (room.capacity === 0) throw forbiddenError();
+
   const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
   if (!enrollment) throw notFoundError();
 
@@ -21,10 +24,6 @@ export async function postBooking(userId: number, roomId: number) {
   if (!ticket || ticket.status === 'RESERVED' || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) {
     throw forbiddenError();
   }
-
-  const room = await bookingRepository.findRoom(roomId);
-  if (!room) throw notFoundError();
-  if (room.capacity === 0) throw forbiddenError();
 
   const newBooking = await bookingRepository.createBooking(userId, roomId);
 
