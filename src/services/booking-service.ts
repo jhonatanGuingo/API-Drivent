@@ -5,7 +5,7 @@ import { bookingRepository } from '@/repositories/booking-repository';
 export async function getBooking(userId: number) {
   const booking = await bookingRepository.findBookingbyUser(userId);
   console.log('cheguei');
-  if (!booking) throw notFoundError();
+  if (!booking) return notFoundError();
   const body = {
     bookingId: booking.id,
     Room: booking.Room,

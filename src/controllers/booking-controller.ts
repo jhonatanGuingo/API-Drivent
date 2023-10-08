@@ -5,7 +5,7 @@ import { bookingService } from '@/services';
 
 export async function getBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
-  const booking = await bookingService.getBooking(userId);
+  const booking = await bookingService.getBooking(Number(userId));
   res.status(httpStatus.OK).send(booking);
 }
 
