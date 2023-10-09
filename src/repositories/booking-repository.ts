@@ -31,9 +31,6 @@ async function createBooking(userId: number, roomId: number) {
       userId,
       roomId,
     },
-    select: {
-      roomId: true,
-    },
   });
   return result;
 }

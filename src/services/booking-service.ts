@@ -30,7 +30,7 @@ export async function postBooking(userId: number, roomId: number) {
   const newBooking = await bookingRepository.createBooking(userId, roomId);
 
   const body = {
-    bookingId: newBooking.roomId,
+    bookingId: newBooking.id,
   };
   return body;
 }
